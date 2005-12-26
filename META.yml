@@ -1,16 +1,15 @@
 name: Class-Adapter
-version: 0.02
-abstract: Perl implementation of the Adapter Design Pattern
-author: Adam Kennedy<adam@ali.as>
-license: unknown
+version: 1.00
+abstract: Perl implementation of the "Adapter" Design Pattern
+author: Adam Kennedy <cpan@ali.as>, L<http://ali.as/>
+license: perl
 distribution_type: module
 build_requires:
-  File::Spec: 0.82
+  File::Spec: 0.80
   Test::More: 0.47
 requires:
-  perl: 5.005
   Scalar::Util: 1.10
 no_index:
   directory:
     - inc
-generated_by: Module::Install version 0.36
+generated_by: Module::Install version 0.45

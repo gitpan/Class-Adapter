@@ -4,29 +4,28 @@ package Class::Adapter;
 
 =head1 NAME
 
-Class::Adapter - Perl implementation of the Adapter Design Pattern
+Class::Adapter - Perl implementation of the "Adapter" Design Pattern
 
 =head1 DESCRIPTION
 
 The C<Class::Adapter> class is intended as an abstract base class for
-creating any sort of class or object that follows the I<Adapter> pattern,
-and some that follow the I<Decorator> pattern. (sort of)
+creating any sort of class or object that follows the I<Adapter> pattern.
 
 =head2 What is an Adapter?
 
 The term I<Adapter> refers to a I<"Design Pattern"> of the same name,
-from the famous "Gang of Four" book. Although their original
-implementation is designed for Java and similar single-inheritance
-strictly-typed langauge, the situation for which it applies is still
-valid.
+from the famous I<"Gang of Four"> book I<"Design Patterns">. Although
+their original implementation was designed for Java and similar
+single-inheritance strictly-typed langauge, the situation for which it
+applies is still valid.
 
-An I<Adapter> in this Perl sense of the term is used to achieve by
-composition (objects containing other object) what can't be achieved
-by inheritance (sub-classing).
+An I<Adapter> in this Perl sense of the term is when a class is created
+to achieve by composition (objects containing other object) something that
+can't be achieved by inheritance (sub-classing).
 
 This is similar to the I<Decorator> pattern, but is intended to be
-applied primarily on a class-by-class basis, as opposed to being
-flexible when used with a single one-off object.
+applied on a class-by-class basis, as opposed to being able to be applied
+one object at a time, as is the case with the I<Decorator> pattern.
 
 The C<Class::Adapter> object holds a parent object that it "wraps",
 and when a method is called on the C<Class::Adapter>, it manually
@@ -36,18 +35,20 @@ parameters on the parent object contained within it.
 Instead of these custom methods being hooked in on an object-by-object
 basis, they are defined at the class level.
 
-Basically, a C<Class::Adapter> class/object is your fall-back position
+Basically, a C<Class::Adapter> is one of your fall-back positions
 when Perl's inheritance model fails you, or is no longer good enough,
 and you need to do something twisty in order to make several APIs play
 nicely with each other.
 
-=head2 What can I do with this specific Class::Adapter class
+=head2 What can I do with the actual Class::Adapter class
 
-Well actually... nothing.
+Well... nothing really. It exist to provide some extremely low level
+fundamental methods, and to provide a common base for inheritance of
+Adapter classes.
 
 The base C<Class::Adapter> class doesn't even implement a way to push
 method calls through to the underlying object, since the way in which
-THAT happens is the bit that changes from case to case.
+B<that> happens is the bit that changes from case to case.
 
 To actually DO something, you probably want to go take a look at
 L<Class::Adapter::Builder>, which makes the creation of I<Adapter>
@@ -67,7 +68,7 @@ use Scalar::Util ();
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '0.02';
+	$VERSION = '1.00';
 }
 
 
@@ -122,11 +123,6 @@ sub _OBJECT_ {
 
 =pod
 
-=head1 BUGS
-
-It's still early day yet, so you should expect some change throughout
-the entire C<Class::Adapter> namespace.
-
 =head1 SUPPORT
 
 Bugs should be reported via the CPAN bug tracker at
@@ -141,11 +137,11 @@ For other issues, contact the author.
 
 =head1 AUTHOR
 
-Adam Kennedy (Maintainer), L<http://ali.as/>, cpan@ali.as
+Adam Kennedy E<lt>cpan@ali.asE<gt>, L<http://ali.as/>
 
 =head1 SEE ALSO
 
-L<Class::Adapter::Clear>, L<Class::Adapter::Factory>
+L<Class::Adapter::Clear>, L<Class::Adapter::Builder>, L<Class::Decorator>
 
 =head1 COPYRIGHT
 

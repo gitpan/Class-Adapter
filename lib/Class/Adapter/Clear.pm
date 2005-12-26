@@ -4,7 +4,7 @@ package Class::Adapter::Clear;
 
 =head1 NAME
 
-Class::Adapter::Clear - A handy base Decorator class that makes no changes
+Class::Adapter::Clear - A handy base Adapter class that makes no changes
 
 =head1 SYNOPSIS
 
@@ -20,7 +20,7 @@ B<Hello World with CGI.pm the normal way>
         $q->h1('hello world'),         # Hello World!
         $q->end_html;                  # End the page
 
-B<Hello World with CGI.pm the Decorator'ed way>
+B<Hello World with CGI.pm the Adapter'ed way>
 
   # Load and create the CGI
   use CGI;
@@ -111,6 +111,13 @@ unusual or tricky with C<CODE> references.
 You may never need this much power. But when you need it, you B<really>
 need it.
 
+As an aside, Class::Adapter::Clear is implemented with the following
+L<Class::Adapter::Builder> formula.
+
+  use Class::Adapter::Builder
+      ISA      => '_OBJECT_',
+      AUTOLOAD => 1;
+
 =head1 METHODS
 
 =head2 new $object
@@ -131,7 +138,7 @@ use Class::Adapter::Builder
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '0.02';
+	$VERSION = '1.00';
 }
 
 1;
@@ -148,7 +155,7 @@ For other issues, contact the author.
 
 =head1 AUTHOR
 
-Adam Kennedy (Maintainer), L<http://ali.as/>, cpan@ali.as
+Adam Kennedy E<lt>cpan@ali.asE<gt>, L<http://ali.as/>
 
 =head1 SEE ALSO
 

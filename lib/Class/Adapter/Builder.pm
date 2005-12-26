@@ -23,8 +23,8 @@ Class::Adapter::Builder - Generate Class::Adapter classes
 C<Class::Adapter::Builder> is another mechanism for letting you create
 I<Adapter> classes of your own.
 
-It is intended to act as a toolkit for creating many varied and different
-types of I<Adapter> classes.
+It is intended to act as a toolkit for generating the guts of many varied
+and different types of I<Adapter> classes.
 
 For a simple base class you can inherit from and change a specific method,
 see L<Class::Adapter::Clear>.
@@ -76,9 +76,16 @@ By default, a C<Class::Adapter> does not pass on any methods, with the
 methods to be passed on specified explicitly with the C<'METHODS'>
 param.
 
-By setting C<AUTOLOAD> to true, the C<Decorator> will be given the
+By setting C<AUTOLOAD> to true, the C<Adapter> will be given the
 standard C<AUTOLOAD> function to to pass through all unspecified
 methods to the parent object.
+
+By default the AUTOLOAD will pass through any and all calls, including
+calls to private methods.
+
+If the AUTOLOAD is specifically set to 'PUBLIC', the AUTOLOAD setting
+will ONLY apply to public methods, and any private methods will not
+be passed through.
 
 =item METHODS
 
@@ -136,7 +143,7 @@ use Class::Adapter ();
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '0.02';
+	$VERSION = '1.00';
 }
 
 
@@ -218,8 +225,15 @@ sub set_ISA {
 
 sub set_AUTOLOAD {
 	my $self = shift;
-	$self->{autoload} = 'normal';
-	$self->{modules}->{Carp} = 1;
+	if ( $_[0] ) {
+		$self->{autoload} = 1;		
+		$self->{modules}->{Carp} = 1;
+		if ( $_[0] eq 'PUBLIC' ) {
+			$self->{autoload_public} = 1;
+		}
+	} else {
+		delete $self->{autoload};
+	}
 	1;
 }
 
@@ -268,7 +282,7 @@ sub make_class {
 	}
 
 	if ( $self->{new} ) {
-		$self->_make_auto_new( $self->{new} );
+		push @parts, $self->_make_new( $self->{new} );
 	}
 
 	my $methods = $self->{methods};
@@ -280,12 +294,15 @@ sub make_class {
 		push @parts, $self->_make_OBJECT;
 	}
 
-	if ( $self->{autoload} eq 'normal' ) {
-		push @parts, $self->_make_AUTOLOAD( $self->{target} );
+	if ( $self->{autoload} ) {
+		push @parts, $self->_make_AUTOLOAD( $self->{target}, $self->{autoload_public} );
 	}
 
 	join( "\n", @parts, "1;\n" );
 }
+
+
+
 
 sub _make_modules {
 	my $self = shift;
@@ -295,21 +312,26 @@ sub _make_modules {
 	"use strict;\n${str}use base 'Class::Adapter';\n";
 }
 
-sub _make_auto_new { <<"END" }
+
+
+sub _make_new { <<"END_NEW" }
 sub new {
 	my \$class  = ref \$_[0] ? ref shift : shift;
-	my \$object = $_[2]\->new(\@_);
+	my \$object = $_[1]\->new(\@_);
 	Scalar::Util::blessed(\$object) or return undef;
-	$_[1]\->new(\$object);
+	\$class->SUPER::new(\$object);
 }
-END
+END_NEW
 
-sub _make_method { <<"END" }
+
+
+sub _make_method { <<"END_METHOD" }
 sub $_[1] { shift->_OBJECT_->$_[2](\@_) }
-END
+END_METHOD
 
 
-sub _make_OBJECT { <<"END" }
+
+sub _make_OBJECT { <<"END_ISACAN" }
 sub isa {
 	shift->_OBJECT_->isa(\@_);
 }
@@ -317,16 +339,21 @@ sub isa {
 sub can {
 	shiff->_OBJECT_->can(\@_);
 }
-END
+END_ISACAN
 
-sub _make_AUTOLOAD { <<"END" }
+
+
+
+sub _make_AUTOLOAD { my $pub = $_[2] ? 'and substr($method, 0, 1) ne "_"' : ''; return <<"END_AUTOLOAD" }
 sub AUTOLOAD {
 	my \$self     = shift;
 	my (\$method) = \$$_[1]::AUTOLOAD =~ m/^.*::(.*)\$/s;
-	ref(\$self) or Carp::croak(
-		qq{Can't locate object method "\$method" via package "\$self" }
+	unless ( ref(\$self) $pub) {
+		Carp::croak(
+			qq{Can't locate object method "\$method" via package "\$self" }
 			. qq{(perhaps you forgot to load "\$self")}
 		);
+	}
 	\$self->_OBJECT_->\$method(\@_);
 }
 
@@ -334,7 +361,10 @@ sub DESTROY {
 	my \$object = \$_[0]->_OBJECT_;
 	\$object->DESTROY if \$object->can('DESTROY');
 }
-END
+END_AUTOLOAD
+
+
+
 
 1;
 
@@ -350,7 +380,7 @@ For other issues, contact the author.
 
 =head1 AUTHOR
 
-Adam Kennedy (Maintainer), L<http://ali.as/>, cpan@ali.as
+Adam Kennedy E<lt>cpan@ali.asE<gt>, L<http://ali.as/>
 
 =head1 SEE ALSO
 

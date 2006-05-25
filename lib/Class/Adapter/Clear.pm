@@ -131,6 +131,7 @@ in an object.
 
 =cut
 
+use 5.005;
 use strict;
 use Class::Adapter::Builder
 	ISA      => '_OBJECT_',
@@ -138,7 +139,7 @@ use Class::Adapter::Builder
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.01';
+	$VERSION = '1.02';
 }
 
 1;

@@ -62,13 +62,14 @@ underlying object.
 
 =cut
 
+use 5.005;
 use strict;
 use Carp         ();
 use Scalar::Util ();
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.01';
+	$VERSION = '1.02';
 }
 
 

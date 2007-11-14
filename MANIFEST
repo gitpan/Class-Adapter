@@ -21,4 +21,5 @@ t/03_builder.t
 t/04_clear.t
 t/05_autoload.t
 t/06_static.t
-t/99_author.t
+t/98_pod.t
+t/99_pmv.t

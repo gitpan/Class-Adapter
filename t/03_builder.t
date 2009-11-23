@@ -39,16 +39,20 @@ BEGIN {
 }
 
 sub isa {
-	shift->_OBJECT_->isa(@_);
+	ref($_[0])
+	? shift->_OBJECT_->isa(@_)
+	: shift->isa(@_);
 }
 
 sub can {
-	shift->_OBJECT_->can(@_);
+	ref($_[0])
+	? shift->_OBJECT_->can(@_)
+	: shift->can(@_);
 }
 
 sub AUTOLOAD {
 	my $self     = shift;
-	my ($method) = $My::Clear::AUTOLOAD =~ m/^.*::(.*)$/s;
+	my ($method) = $My::Clear::AUTOLOAD =~ m/^.*::(.*)\z/s;
 	unless ( ref($self) ) {
 		Carp::croak(
 			  qq{Can't locate object method "$method" via package "$self" }
@@ -60,9 +64,8 @@ sub AUTOLOAD {
 
 sub DESTROY {
 	if ( defined $_[0]->{OBJECT} and $_[0]->{OBJECT}->can('DESTROY') ) {
-		$_[0]->{OBJECT}->DESTROY;
+		undef $_[0]->{OBJECT};
 	}
-	delete $_[0]->{OBJECT};
 }
 
 1;

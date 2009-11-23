@@ -144,7 +144,7 @@ use Class::Adapter ();
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.05';
+	$VERSION = '1.06';
 }
 
 
@@ -379,11 +379,15 @@ END_METHOD
 
 sub _make_OBJECT { <<"END_OBJECT" }
 sub isa {
-	shift->_OBJECT_->isa(\@_);
+	ref(\$_[0])
+	? shift->_OBJECT_->isa(\@_)
+	: shift->isa(\@_);
 }
 
 sub can {
-	shift->_OBJECT_->can(\@_);
+	ref(\$_[0])
+	? shift->_OBJECT_->can(\@_)
+	: shift->can(\@_);
 }
 END_OBJECT
 
@@ -400,7 +404,7 @@ sub _make_ISA {
 		# we should try to require the module (even if it doesn't exist)
 		# so that we can provide an accurate answer in the case where
 		# we are faking a module that exists.
-		( map { "\trequire $_;\n" } @{$self->{fake}} ),
+		( map { "\trequire $_ unless $_->isa('UNIVERSAL');\n" } @{$self->{fake}} ),
 		"\treturn 1 if \$_[0]->SUPER::can(\$_[1]);\n",
 		( map { "\treturn 1 if $_->can(\$_[1]);\n" } @_ ),
 		"\treturn undef;\n",
@@ -414,7 +418,7 @@ sub _make_ISA {
 sub _make_AUTOLOAD { my $pub = $_[2] ? 'and substr($method, 0, 1) ne "_"' : ''; return <<"END_AUTOLOAD" }
 sub AUTOLOAD {
 	my \$self     = shift;
-	my (\$method) = \$$_[1]::AUTOLOAD =~ m/^.*::(.*)\$/s;
+	my (\$method) = \$$_[1]::AUTOLOAD =~ m/^.*::(.*)\\z/s;
 	unless ( ref(\$self) $pub) {
 		Carp::croak(
 			  qq{Can't locate object method "\$method" via package "\$self" }
@@ -426,9 +430,8 @@ sub AUTOLOAD {
 
 sub DESTROY {
 	if ( defined \$_[0]->{OBJECT} and \$_[0]->{OBJECT}->can('DESTROY') ) {
-		\$_[0]->{OBJECT}->DESTROY;
+		undef \$_[0]->{OBJECT};
 	}
-	delete \$_[0]->{OBJECT};
 }
 END_AUTOLOAD
 
@@ -454,7 +457,7 @@ L<Class::Adapter>, L<Class::Adapter::Clear>
 
 =head1 COPYRIGHT
 
-Copyright 2005 - 2008 Adam Kennedy.
+Copyright 2005 - 2009 Adam Kennedy.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

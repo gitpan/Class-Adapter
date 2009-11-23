@@ -3,9 +3,12 @@ abstract: "Perl implementation of the \"Adapter\" Design Pattern"
 author:
   - 'Adam Kennedy <adamk@cpan.org>'
 build_requires:
+  ExtUtils::MakeMaker: 6.42
   Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
 distribution_type: module
-generated_by: 'Module::Install version 0.77'
+generated_by: 'Module::Install version 0.91'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,5 +23,7 @@ requires:
   Scalar::Util: 1.10
   perl: 5.005
 resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/Class-Adapter
   license: http://dev.perl.org/licenses/
-version: 1.05
+  repository: http://svn.ali.as/cpan/trunk/Class-Adapter
+version: 1.06
